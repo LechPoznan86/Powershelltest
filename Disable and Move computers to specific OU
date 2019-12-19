@@ -1,0 +1,22 @@
+ ################################
+ # Disable and Move to Stale OU #
+ ################################
+
+$LogTime = Get-Date -Format "MM-dd-yyyy_hh-mm-ss"
+$LogFile = 'path_to_desired_logfile'+"LOG_"+$LogTime+".csv"
+
+
+$computers = import-excel "path_to_excel_sheet"
+ForEach ($computer in $computers)
+{
+
+    get-adcomputer $computer.Name | disable-adaccount
+    get-adcomputer $computer.Name | move-adobject -targetpath "AD_path"
+        if ($computer.enabled -eq "False" -AND $computer.DistinguishedName -contains "specific_OU"){ "$computer.computer , was disabled and moved"|Out-File $LogFile -Append -Force}
+
+        else
+        {
+         "$computer.computer, was NOT disabled and NOT moved"|Out-File $LogFile -Append -Force
+        }
+
+}
