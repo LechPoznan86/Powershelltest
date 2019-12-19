@@ -1,0 +1,10 @@
+####################################
+# Get list of stale machines in AD #
+####################################
+
+$cut_off_date = [DateTime]::Today.AddDays(-120)
+$logfile = "path_to_desired_log_file"
+
+$ADInformation = Get-ADComputer -Filter * -SearchBase "input_needed" -Properties Name, canonicalname, operatingsystem, LastLogonDate |
+ where {$_.DistinguishedName -Notlike “input_needed”} | where {$_.lastlogondate -le $cut_off_date} | where {$_.lastlogondate -ne $null} | 
+ select -Property Name, canonicalname, operatingsystem, LastLogonDate| Export-Csv $logfile
